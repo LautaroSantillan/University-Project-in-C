@@ -15,4 +15,5 @@ typedef struct
     unsigned int alto;
     unsigned short profundidad;
 }t_metadata;
+
 #endif // ESTRUCTURAS_H_INCLUDED

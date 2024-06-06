@@ -32,81 +32,61 @@ int solucion(int argc, char *argv[]) {
                 puts("Error al convertir la imagen a escala de grises.");
                 return NO_SE_PUEDE_CREAR_ARCHIVO;
             }
-        }
-        else if (strcmp(argv[i], "--tonalidad-azul") == 0)
-        {
+        } else if (strcmp(argv[i], "--tonalidad-azul") == 0) {
             if (convertirTonalidadAzul(nombreArchivo) != TODO_OK)
             {
                 puts("Error al convertir la imagen a tonalidad azul.");
                 return NO_SE_PUEDE_CREAR_ARCHIVO;
             }
-        }
-        else if (strcmp(argv[i], "--tonalidad-negativa") == 0)
-        {
+        } else if (strcmp(argv[i], "--tonalidad-negativa") == 0) {
             if (convertirTonalidadNegativo(nombreArchivo) != TODO_OK)
             {
                 puts("Error al convertir la imagen a tonalidad negativa.");
                 return NO_SE_PUEDE_CREAR_ARCHIVO;
             }
-        }
-        else if (strcmp(argv[i], "--rotar-derecha") == 0)
-        {
+        } else if (strcmp(argv[i], "--rotar-derecha") == 0) {
             if (rotarDerecha(nombreArchivo) != TODO_OK)
             {
                 puts("Error al rotar la imagen a la derecha.");
                 return NO_SE_PUEDE_CREAR_ARCHIVO;
             }
-        }
-        else if (strcmp(argv[i], "--tonalidad-roja") == 0)
-        {
+        } else if (strcmp(argv[i], "--tonalidad-roja") == 0) {
             if (convertirTonalidadRojo(nombreArchivo) != TODO_OK)
             {
                 puts("Error al convertir la imagen a tonalidad rojo.");
                 return NO_SE_PUEDE_CREAR_ARCHIVO;
             }
-        }
-        else if (strcmp(argv[i], "--tonalidad-verde") == 0)
-        {
+        } else if (strcmp(argv[i], "--tonalidad-verde") == 0) {
             if (convertirTonalidadVerde(nombreArchivo) != TODO_OK)
             {
                 puts("Error al convertir la imagen a tonalidad verde.");
                 return NO_SE_PUEDE_CREAR_ARCHIVO;
             }
-        }
-        else if (strcmp(argv[i], "--rotar-izquierda") == 0)
-        {
+        } else if (strcmp(argv[i], "--rotar-izquierda") == 0) {
             if (rotarIzquierda(nombreArchivo) != TODO_OK)
             {
                 puts("Error al rotar la imagen a la izquierda.");
                 return NO_SE_PUEDE_CREAR_ARCHIVO;
             }
-        }
-        else if (strcmp(argv[i], "--recortar") == 0)
-        {
+        } else if (strcmp(argv[i], "--recortar") == 0) {
             if (recortar(nombreArchivo) != TODO_OK)
             {
                 puts("Error al recortar la imagen.");
                 return NO_SE_PUEDE_CREAR_ARCHIVO;
             }
-        }
-        else if (strcmp(argv[i], "--aumentar-contraste") == 0)
-        {
+        } else if (strcmp(argv[i], "--aumentar-contraste") == 0) {
             if (aumentarContraste(nombreArchivo) != TODO_OK)
             {
                 puts("Error al aumentar el contraste.");
                 return NO_SE_PUEDE_CREAR_ARCHIVO;
             }
-        }
-        else if (strcmp(argv[i], "--reducir-contraste") == 0)
-        {
+        } else if (strcmp(argv[i], "--reducir-contraste") == 0) {
             if (reducirContraste(nombreArchivo) != TODO_OK)
             {
                 puts("Error al reducir el contraste.");
                 return NO_SE_PUEDE_CREAR_ARCHIVO;
             }
-        }
-        else
-        {
+        } else {
             printf("Opcion no reconocida: %s", argv[i]);
             return ARCHIVO_NO_ENCONTRADO;
         }
@@ -177,15 +157,12 @@ int guardarBMP(const char *nombreArchivo, const t_metadata *metadata, const t_pi
     putc('B', archivo);
     putc('M', archivo);
 
-    // Escribir tamaño del archivo
-    fwrite(&metadata->tamArchivo, sizeof(unsigned int), 1, archivo);
+    fwrite(&metadata->tamArchivo, sizeof(unsigned int), 1, archivo); // Escribir tamaño del archivo
 
-    // Reservado (4 bytes)
     unsigned int reservado = 0;
-    fwrite(&reservado, sizeof(unsigned int), 1, archivo);
+    fwrite(&reservado, sizeof(unsigned int), 1, archivo); // Reservado (4 bytes)
 
-    // Offset de los datos de la imagen
-    fwrite(&inicioIMG, sizeof(unsigned int), 1, archivo);
+    fwrite(&inicioIMG, sizeof(unsigned int), 1, archivo); // Offset de los datos de la imagen
 
     // Escribir el encabezado
     fseek(archivo, 14, SEEK_SET);
@@ -524,7 +501,6 @@ int rotarIzquierda(const char *nombreArchivo)
     {
         for (unsigned int j = 0; j < metadata.ancho; j++) // j
             nuevaImagen[(nuevoAlto - j - 1) * nuevoAncho + i] = imagen[i * metadata.ancho + j];
-
     }
 
     // Actualizar metadatos
