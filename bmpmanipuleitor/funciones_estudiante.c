@@ -22,6 +22,7 @@ int solucion(int argc, char *argv[]) {
         return ERR_ARG;
 
     const char *nombreArchivo = argv[argc - 1];
+    //const char *nombreArchivo2 = argv[argc - 1];
 
     for (int i = 1; i < argc - 1; i++)
     {
@@ -86,6 +87,12 @@ int solucion(int argc, char *argv[]) {
                 puts("Error al reducir el contraste.");
                 return NO_SE_PUEDE_CREAR_ARCHIVO;
             }
+//        } else if (strcmp(argv[i], "--concatenar") == 0) {
+//            if (concatenar(nombreArchivo, nombreArchivo2) != TODO_OK)
+//            {
+//                puts("Error al concatenar las imagenes.");
+//                return NO_SE_PUEDE_CREAR_ARCHIVO;
+//            }
         } else {
             printf("Opcion no reconocida: %s", argv[i]);
             return ARCHIVO_NO_ENCONTRADO;
@@ -434,50 +441,6 @@ int recortar(const char *nombreArchivo)
     return TODO_OK;
 }
 
-int rotarDerecha(const char *nombreArchivo)
-{
-    t_metadata metadata;
-    t_pixel *imagen;
-
-    if (leerBMP(nombreArchivo, &metadata, &imagen) != TODO_OK)
-        return ARCHIVO_NO_ENCONTRADO;
-
-    unsigned int nuevoAncho = metadata.alto;
-    unsigned int nuevoAlto = metadata.ancho;
-
-    t_pixel *nuevaImagen = (t_pixel *)malloc(nuevoAncho * nuevoAlto * sizeof(t_pixel));
-    if (!nuevaImagen)
-    {
-        free(imagen);
-        return NO_SE_PUEDE_CREAR_ARCHIVO;
-    }
-
-    // Rotar 90 grados a la derecha
-    for (unsigned int i = 0; i < metadata.alto; i++) // y
-    {
-        for (unsigned int j = 0; j < metadata.ancho; j++)
-            nuevaImagen[j * nuevoAncho + (nuevoAncho - i - 1)] = imagen[i * metadata.ancho + j];
-    }
-
-    // Actualizar metadatos
-    metadata.ancho = nuevoAncho;
-    metadata.alto = nuevoAlto;
-    metadata.tamArchivo = 54 + nuevoAncho * nuevoAlto * sizeof(t_pixel);
-
-    char nombreArchivoRotada[255] = "reyes_rotar-derecha.bmp";
-
-    if (guardarBMP(nombreArchivoRotada, &metadata, nuevaImagen) != TODO_OK)
-    {
-        free(imagen);
-        free(nuevaImagen);
-        return NO_SE_PUEDE_CREAR_ARCHIVO;
-    }
-
-    free(imagen);
-    free(nuevaImagen);
-    return TODO_OK;
-}
-
 int rotarIzquierda(const char *nombreArchivo)
 {
     t_metadata metadata;
@@ -499,8 +462,8 @@ int rotarIzquierda(const char *nombreArchivo)
     // Rotar 90 grados a la izquierda
     for (unsigned int i = 0; i < metadata.alto; i++) // y
     {
-        for (unsigned int j = 0; j < metadata.ancho; j++) // j
-            nuevaImagen[(nuevoAlto - j - 1) * nuevoAncho + i] = imagen[i * metadata.ancho + j];
+        for (unsigned int j = 0; j < metadata.ancho; j++)
+            nuevaImagen[j * nuevoAncho + (nuevoAncho - i - 1)] = imagen[i * metadata.ancho + j];
     }
 
     // Actualizar metadatos
@@ -519,5 +482,115 @@ int rotarIzquierda(const char *nombreArchivo)
 
     free(imagen);
     free(nuevaImagen);
+    return TODO_OK;
+}
+
+int rotarDerecha(const char *nombreArchivo)
+{
+    t_metadata metadata;
+    t_pixel *imagen;
+
+    if (leerBMP(nombreArchivo, &metadata, &imagen) != TODO_OK)
+        return ARCHIVO_NO_ENCONTRADO;
+
+    unsigned int nuevoAncho = metadata.alto;
+    unsigned int nuevoAlto = metadata.ancho;
+
+    t_pixel *nuevaImagen = (t_pixel *)malloc(nuevoAncho * nuevoAlto * sizeof(t_pixel));
+    if (!nuevaImagen)
+    {
+        free(imagen);
+        return NO_SE_PUEDE_CREAR_ARCHIVO;
+    }
+
+    // Rotar 90 grados a la derecha
+    for (unsigned int i = 0; i < metadata.alto; i++) // y
+    {
+        for (unsigned int j = 0; j < metadata.ancho; j++) // j
+            nuevaImagen[(nuevoAlto - j - 1) * nuevoAncho + i] = imagen[i * metadata.ancho + j];
+    }
+
+    // Actualizar metadatos
+    metadata.ancho = nuevoAncho;
+    metadata.alto = nuevoAlto;
+    metadata.tamArchivo = 54 + nuevoAncho * nuevoAlto * sizeof(t_pixel);
+
+    char nombreArchivoRotada[255] = "reyes_rotar-derecha.bmp";
+
+    if (guardarBMP(nombreArchivoRotada, &metadata, nuevaImagen) != TODO_OK)
+    {
+        free(imagen);
+        free(nuevaImagen);
+        return NO_SE_PUEDE_CREAR_ARCHIVO;
+    }
+
+    free(imagen);
+    free(nuevaImagen);
+    return TODO_OK;
+}
+
+int concatenar(const char* nombreArchivo, const char* nombreArchivo2)
+{
+t_metadata metadata, metadata2;
+    t_pixel *img = NULL;
+    t_pixel *img2 = NULL;
+    t_pixel *imgCon = NULL;
+    unsigned char color[3] = {173, 216, 230};
+
+    if (leerBMP(nombreArchivo, &metadata, &img) != TODO_OK)
+        return ARCHIVO_NO_ENCONTRADO;
+
+    if (leerBMP(nombreArchivo2, &metadata2, &img2) != TODO_OK) {
+        free(img);
+        return ARCHIVO_NO_ENCONTRADO;
+    }
+
+    int nuevoAncho = (metadata.ancho < metadata2.ancho) ? metadata2.ancho : metadata.ancho;
+    int nuevoAlto = metadata.alto + metadata2.alto;
+
+    imgCon = malloc(nuevoAlto * nuevoAncho * sizeof(t_pixel));
+    if (!imgCon) {
+        free(img);
+        free(img2);
+        return NO_SE_PUEDE_CREAR_ARCHIVO;
+    }
+
+    // Rellenar con nuevo color
+    for (int i = 0; i < nuevoAlto; i++) {
+        for (int j = 0; j < nuevoAncho; j++) {
+            imgCon[i * nuevoAncho + j].pixel[0] = color[0];
+            imgCon[i * nuevoAncho + j].pixel[1] = color[1];
+            imgCon[i * nuevoAncho + j].pixel[2] = color[2];
+            imgCon[i * nuevoAncho + j].profundidad = img[0].profundidad; // Suponiendo que todas las imÃ¡genes tienen la misma profundidad
+        }
+    }
+
+    // Copiar primera imagen
+    for (int i = 0; i < metadata.alto; i++) {
+        for (int j = 0; j < metadata.ancho; j++) {
+            imgCon[i * nuevoAncho + j] = img[i * metadata.ancho + j];
+        }
+    }
+
+    // Copiar segunda imagen
+    for (int i = 0; i < metadata2.alto; i++) {
+        for (int j = 0; j < metadata2.ancho; j++) {
+            imgCon[(i + metadata.alto) * nuevoAncho + j] = img2[i * metadata2.ancho + j];
+        }
+    }
+
+    char nombreArchivoConcatenar[255] = "reyes_concatenar.bmp";
+
+    if (guardarBMP(nombreArchivoConcatenar, &metadata, imgCon) != TODO_OK) {
+        free(img);
+        free(img2);
+        free(imgCon);
+        return NO_SE_PUEDE_CREAR_ARCHIVO;
+    }
+
+    free(img);
+    free(img2);
+    free(imgCon);
+
     return TODO_OK;
 }
