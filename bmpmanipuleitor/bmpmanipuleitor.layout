@@ -7,42 +7,40 @@
 			<Cursor1 position="150" topLine="0" />
 		</Cursor>
 	</File>
-	<File name="funciones_estudiante.c" open="1" top="1" tabpos="5" split="0" active="1" splitpos="0" zoom_1="4" zoom_2="0">
+	<File name="estructuras.h" open="1" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="4" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="653" topLine="0" />
+			<Cursor1 position="138" topLine="0" />
+		</Cursor>
+	</File>
+	<File name="funciones_estudiante.h" open="1" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="1" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="142" topLine="0" />
+		</Cursor>
+	</File>
+	<File name="funciones_estudiante.c" open="1" top="1" tabpos="5" split="0" active="1" splitpos="0" zoom_1="1" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="565" topLine="21" />
 		</Cursor>
 		<Folding>
-			<Collapse line="106" />
-			<Collapse line="151" />
-			<Collapse line="216" />
-			<Collapse line="244" />
-			<Collapse line="272" />
-			<Collapse line="300" />
-			<Collapse line="328" />
-			<Collapse line="355" />
-			<Collapse line="377" />
-			<Collapse line="387" />
-			<Collapse line="393" />
-			<Collapse line="399" />
-			<Collapse line="419" />
-			<Collapse line="444" />
-			<Collapse line="488" />
-			<Collapse line="532" />
+			<Collapse line="120" />
+			<Collapse line="165" />
+			<Collapse line="233" />
+			<Collapse line="261" />
+			<Collapse line="289" />
+			<Collapse line="317" />
+			<Collapse line="345" />
+			<Collapse line="372" />
+			<Collapse line="404" />
+			<Collapse line="410" />
+			<Collapse line="416" />
+			<Collapse line="461" />
+			<Collapse line="505" />
+			<Collapse line="550" />
 		</Folding>
 	</File>
 	<File name="main.c" open="1" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="8" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="84" topLine="0" />
-		</Cursor>
-	</File>
-	<File name="estructuras.h" open="1" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="4" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="318" topLine="0" />
-		</Cursor>
-	</File>
-	<File name="funciones_estudiante.h" open="1" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="5" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="609" topLine="2" />
+			<Cursor1 position="35" topLine="0" />
 		</Cursor>
 	</File>
 </CodeBlocks_layout_file>
