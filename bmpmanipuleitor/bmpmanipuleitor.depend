@@ -1,10 +1,10 @@
 # depslib dependency file v1.0
-1717544451 source:d:\programacion\topicosdeprogramacion\tp_topicos_2024_1c_miercoles_reyes\bmpmanipuleitor\main.c
+1718076656 source:d:\programacion\topicosdeprogramacion\tp_topicos_2024_1c_miercoles_reyes\bmpmanipuleitor\main.c
 	"funciones_estudiante.h"
 	"estructuras.h"
 	"constantes.h"
 
-1717863312 d:\programacion\topicosdeprogramacion\tp_topicos_2024_1c_miercoles_reyes\bmpmanipuleitor\funciones_estudiante.h
+1718220299 d:\programacion\topicosdeprogramacion\tp_topicos_2024_1c_miercoles_reyes\bmpmanipuleitor\funciones_estudiante.h
 	<stdio.h>
 	<stdlib.h>
 	<string.h>

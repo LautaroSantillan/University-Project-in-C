@@ -106,6 +106,30 @@ int solucion(int argc, char *argv[]) {
                 return NO_SE_PUEDE_CREAR_ARCHIVO;
             }
         }
+//        else if (strcmp(argv[i], "--concatenar") == 0)
+//        {
+//            if (concatenar(nombreArchivo, nombreArchivo2) != TODO_OK)
+//            {
+//                puts("Error al concatenar la imagen.");
+//                return NO_SE_PUEDE_CREAR_ARCHIVO;
+//            }
+//        }
+        else if (strcmp(argv[i], "--achicar") == 0)
+        {
+            if (achicar(nombreArchivo) != TODO_OK)
+            {
+                puts("Error al achicar la imagen.");
+                return NO_SE_PUEDE_CREAR_ARCHIVO;
+            }
+        }
+        else if (strcmp(argv[i], "--monocromo") == 0)
+        {
+            if (monocromo(nombreArchivo) != TODO_OK)
+            {
+                puts("Error al hacer monocromo a la imagen.");
+                return NO_SE_PUEDE_CREAR_ARCHIVO;
+            }
+        }
         else
         {
             printf("Opcion no reconocida: %s", argv[i]);
@@ -547,68 +571,164 @@ int rotarIzquierda(const char *nombreArchivo)
     return TODO_OK;
 }
 
-int concatenar(const char* nombreArchivo, const char* nombreArchivo2)
+int concatenar(const char *nombreArchivo1, const char *nombreArchivo2)
 {
-t_metadata metadata, metadata2;
-    t_pixel *img = NULL;
-    t_pixel *img2 = NULL;
-    t_pixel *imgCon = NULL;
-    unsigned char color[3] = {173, 216, 230};
+    t_metadata metadata1, metadata2;
+    t_pixel *imagen1, *imagen2;
 
-    if (leerBMP(nombreArchivo, &metadata, &img) != TODO_OK)
+    // Leer la primera imagen
+    if (leerBMP(nombreArchivo1, &metadata1, &imagen1) != TODO_OK)
         return ARCHIVO_NO_ENCONTRADO;
 
-    if (leerBMP(nombreArchivo2, &metadata2, &img2) != TODO_OK) {
-        free(img);
+    // Leer la segunda imagen
+    if (leerBMP(nombreArchivo2, &metadata2, &imagen2) != TODO_OK) {
+        free(imagen1);
         return ARCHIVO_NO_ENCONTRADO;
     }
 
-    int nuevoAncho = (metadata.ancho < metadata2.ancho) ? metadata2.ancho : metadata.ancho;
-    int nuevoAlto = metadata.alto + metadata2.alto;
+    // Calcular el nuevo ancho y alto de la imagen concatenada
+    unsigned int nuevoAncho = (metadata1.ancho > metadata2.ancho) ? metadata1.ancho : metadata2.ancho;
+    unsigned int nuevoAlto = metadata1.alto + metadata2.alto;
 
-    imgCon = malloc(nuevoAlto * nuevoAncho * sizeof(t_pixel));
-    if (!imgCon) {
-        free(img);
-        free(img2);
-        return NO_SE_PUEDE_CREAR_ARCHIVO;
+    // Crear una nueva imagen para almacenar la imagen concatenada
+    t_pixel *imagenConcatenada = (t_pixel *)malloc(sizeof(t_pixel) * nuevoAncho * nuevoAlto);
+    if (!imagenConcatenada)
+    {
+        free(imagen1);
+        free(imagen2);
+        return ERR_MEM;
     }
 
-    // Rellenar con nuevo color
-    for (int i = 0; i < nuevoAlto; i++) {
-        for (int j = 0; j < nuevoAncho; j++) {
-            imgCon[i * nuevoAncho + j].pixel[0] = color[0];
-            imgCon[i * nuevoAncho + j].pixel[1] = color[1];
-            imgCon[i * nuevoAncho + j].pixel[2] = color[2];
-            imgCon[i * nuevoAncho + j].profundidad = img[0].profundidad; // Suponiendo que todas las imÃ¡genes tienen la misma profundidad
+    // Copiar la primera imagen a la imagen concatenada
+    for (unsigned int i = 0; i < metadata1.alto; i++)
+    {
+        for (unsigned int j = 0; j < metadata1.ancho; j++)
+            imagenConcatenada[i * nuevoAncho + j] = imagen1[i * metadata1.ancho + j];
+        // Rellenar con color de relleno la parte adicional del ancho
+        for (unsigned int j = metadata1.ancho; j < nuevoAncho; j++)
+        {
+            imagenConcatenada[i * nuevoAncho + j].pixel[0] = 100; // Color de relleno, por ejemplo
+            imagenConcatenada[i * nuevoAncho + j].pixel[1] = 150;
+            imagenConcatenada[i * nuevoAncho + j].pixel[2] = 200;
         }
     }
 
-    // Copiar primera imagen
-    for (int i = 0; i < metadata.alto; i++) {
-        for (int j = 0; j < metadata.ancho; j++) {
-            imgCon[i * nuevoAncho + j] = img[i * metadata.ancho + j];
+    // Copiar la segunda imagen a la imagen concatenada
+    for (unsigned int i = 0; i < metadata2.alto; i++)
+    {
+        for (unsigned int j = 0; j < metadata2.ancho; j++)
+            imagenConcatenada[(metadata1.alto + i) * nuevoAncho + j] = imagen2[i * metadata2.ancho + j];
+        // Rellenar con color de relleno la parte adicional del ancho
+        for (unsigned int j = metadata2.ancho; j < nuevoAncho; j++)
+        {
+            imagenConcatenada[(metadata1.alto + i) * nuevoAncho + j].pixel[0] = 100; // Color de relleno, por ejemplo
+            imagenConcatenada[(metadata1.alto + i) * nuevoAncho + j].pixel[1] = 150;
+            imagenConcatenada[(metadata1.alto + i) * nuevoAncho + j].pixel[2] = 200;
         }
     }
 
-    // Copiar segunda imagen
-    for (int i = 0; i < metadata2.alto; i++) {
-        for (int j = 0; j < metadata2.ancho; j++) {
-            imgCon[(i + metadata.alto) * nuevoAncho + j] = img2[i * metadata2.ancho + j];
+    // Actualizar la metadata
+    metadata1.ancho = nuevoAncho;
+    metadata1.alto = nuevoAlto;
+    metadata1.tamArchivo = nuevoAncho * nuevoAlto * sizeof(t_pixel) + 54;
+
+    // Guardar la imagen concatenada en el archivo
+    char nombreArchivoConcatenado[255] = "reyes_concatenar.bmp";
+    int resultado = guardarBMP(nombreArchivoConcatenado, &metadata1, imagenConcatenada);
+
+    // Liberar la memoria
+    free(imagen1);
+    free(imagen2);
+    free(imagenConcatenada);
+
+    return resultado;
+}
+
+int achicar(const char *nombreArchivo)
+{
+    t_metadata metadata;
+    t_pixel *imagen;
+
+    // Leer la imagen original
+    if (leerBMP(nombreArchivo, &metadata, &imagen) != TODO_OK)
+        return ARCHIVO_NO_ENCONTRADO;
+
+    // Calcular el nuevo ancho y alto de la imagen achicada
+    unsigned int nuevoAncho = metadata.ancho / 2;
+    unsigned int nuevoAlto = metadata.alto / 2;
+
+    // Crear una nueva imagen para almacenar la imagen achicada
+    t_pixel *imagenAchicada = (t_pixel *)malloc(sizeof(t_pixel) * nuevoAncho * nuevoAlto);
+    if (!imagenAchicada)
+    {
+        free(imagen);
+        return ERR_MEM;
+    }
+
+    // Copiar la imagen original a la imagen achicada
+    for (unsigned int i = 0; i < nuevoAlto; i++)
+    {
+        for (unsigned int j = 0; j < nuevoAncho; j++)
+            imagenAchicada[i * nuevoAncho + j] = imagen[i * metadata.ancho * 2 + j * 2];
+    }
+
+    // Actualizar la metadata
+    metadata.ancho = nuevoAncho;
+    metadata.alto = nuevoAlto;
+    metadata.tamArchivo = nuevoAncho * nuevoAlto * sizeof(t_pixel) + 54;
+
+    // Guardar la imagen achicada en el archivo
+    char nombreArchivoAchicado[255] = "reyes_achicar.bmp";
+    int resultado = guardarBMP(nombreArchivoAchicado, &metadata, imagenAchicada);
+
+    // Liberar la memoria
+    free(imagen);
+    free(imagenAchicada);
+
+    return resultado;
+}
+
+int monocromo(const char *nombreArchivo)
+{
+    t_metadata metadata;
+    t_pixel *imagen;
+
+    // Leer la imagen original
+    if (leerBMP(nombreArchivo, &metadata, &imagen) != TODO_OK)
+        return ARCHIVO_NO_ENCONTRADO;
+
+    // Crear una nueva imagen para almacenar la imagen monocromo
+    t_pixel *imagenMonocromo = (t_pixel *)malloc(sizeof(t_pixel) * metadata.ancho * metadata.alto);
+    if (!imagenMonocromo)
+    {
+        free(imagen);
+        return ERR_MEM;
+    }
+
+    // Convertir la imagen original a monocromo
+    for (unsigned int i = 0; i < metadata.alto; i++)
+    {
+        for (unsigned int j = 0; j < metadata.ancho; j++)
+        {
+            unsigned char promedio = (imagen[i * metadata.ancho + j].pixel[0] + imagen[i * metadata.ancho + j].pixel[1] + imagen[i * metadata.ancho + j].pixel[2]) / 3;
+            imagenMonocromo[i * metadata.ancho + j].pixel[0] = promedio < 128 ? 0 : 255;
+            imagenMonocromo[i * metadata.ancho + j].pixel[1] = 0;
+            imagenMonocromo[i * metadata.ancho + j].pixel[2] = 0;
         }
     }
 
-    char nombreArchivoConcatenar[255] = "reyes_concatenar.bmp";
+    // Actualizar la metadata
+    metadata.profundidad = 1;
+    metadata.tamArchivo = metadata.ancho * metadata.alto / 8 + 54;
+    metadata.tamEncabezado = 54;
 
-    if (guardarBMP(nombreArchivoConcatenar, &metadata, imgCon) != TODO_OK) {
-        free(img);
-        free(img2);
-        free(imgCon);
-        return NO_SE_PUEDE_CREAR_ARCHIVO;
-    }
+    // Guardar la imagen monocromo en el archivo
+    char nombreArchivoMonocromo[255] = "reyes_monocromo.bmp";
+    int resultado = guardarBMP(nombreArchivoMonocromo, &metadata, imagenMonocromo);
 
-    free(img);
-    free(img2);
-    free(imgCon);
+    // Liberar la memoria
+    free(imagen);
+    free(imagenMonocromo);
 
-    return TODO_OK;
+    return resultado;
 }

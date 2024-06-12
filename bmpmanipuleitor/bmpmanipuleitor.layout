@@ -2,9 +2,33 @@
 <CodeBlocks_layout_file>
 	<FileVersion major="1" minor="0" />
 	<ActiveTarget name="Debug" />
-	<File name="constantes.h" open="1" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="4" zoom_2="0">
+	<File name="main.c" open="1" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="8" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="150" topLine="0" />
+			<Cursor1 position="35" topLine="0" />
+		</Cursor>
+	</File>
+	<File name="funciones_estudiante.c" open="1" top="1" tabpos="5" split="0" active="1" splitpos="0" zoom_1="1" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="4058" topLine="96" />
+		</Cursor>
+		<Folding>
+			<Collapse line="144" />
+			<Collapse line="189" />
+			<Collapse line="257" />
+			<Collapse line="285" />
+			<Collapse line="313" />
+			<Collapse line="341" />
+			<Collapse line="369" />
+			<Collapse line="396" />
+			<Collapse line="428" />
+			<Collapse line="434" />
+			<Collapse line="440" />
+			<Collapse line="485" />
+		</Folding>
+	</File>
+	<File name="funciones_estudiante.h" open="1" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="1" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="1102" topLine="0" />
 		</Cursor>
 	</File>
 	<File name="estructuras.h" open="1" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="4" zoom_2="0">
@@ -12,35 +36,9 @@
 			<Cursor1 position="138" topLine="0" />
 		</Cursor>
 	</File>
-	<File name="funciones_estudiante.h" open="1" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="1" zoom_2="0">
+	<File name="constantes.h" open="1" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="4" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="142" topLine="0" />
-		</Cursor>
-	</File>
-	<File name="funciones_estudiante.c" open="1" top="1" tabpos="5" split="0" active="1" splitpos="0" zoom_1="1" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="565" topLine="21" />
-		</Cursor>
-		<Folding>
-			<Collapse line="120" />
-			<Collapse line="165" />
-			<Collapse line="233" />
-			<Collapse line="261" />
-			<Collapse line="289" />
-			<Collapse line="317" />
-			<Collapse line="345" />
-			<Collapse line="372" />
-			<Collapse line="404" />
-			<Collapse line="410" />
-			<Collapse line="416" />
-			<Collapse line="461" />
-			<Collapse line="505" />
-			<Collapse line="550" />
-		</Folding>
-	</File>
-	<File name="main.c" open="1" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="8" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="35" topLine="0" />
+			<Cursor1 position="150" topLine="0" />
 		</Cursor>
 	</File>
 </CodeBlocks_layout_file>
