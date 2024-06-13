@@ -19,8 +19,6 @@ int reducirContraste(const char *nombreArchivo);
 int recortar(const char *nombreArchivo);
 int rotarDerecha(const char *nombreArchivo);
 int rotarIzquierda(const char *nombreArchivo);
-int concatenar(const char *nombreArchivo1, const char *nombreArchivo2);
-int achicar(const char *nombreArchivo);
-int monocromo(const char *nombreArchivo);
+int rotar180Grados(const char *nombreArchivo);
 
 #endif // FUNCIONES_ESTUDIANTE_H_INCLUDED

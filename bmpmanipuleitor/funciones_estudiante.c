@@ -13,12 +13,15 @@
     Entrega: Si
     -----------------
 */
+
 #include "funciones_estudiante.h"
-#include "estructuras.h"
 #include "constantes.h"
+#include "estructuras.h"
+
 //bmpmanipuleitor.exe   --funciones   nombreArchivo.bmp -> cmd
 
-int solucion(int argc, char *argv[]) {
+int solucion(int argc, char *argv[])
+{
     if (argc < 3)
         return ERR_ARG;
 
@@ -42,7 +45,7 @@ int solucion(int argc, char *argv[]) {
                 return NO_SE_PUEDE_CREAR_ARCHIVO;
             }
         }
-        else if (strcmp(argv[i], "--tonalidad-negativa") == 0)
+        else if (strcmp(argv[i], "--negativo") == 0)
         {
             if (convertirTonalidadNegativo(nombreArchivo) != TODO_OK)
             {
@@ -106,27 +109,11 @@ int solucion(int argc, char *argv[]) {
                 return NO_SE_PUEDE_CREAR_ARCHIVO;
             }
         }
-//        else if (strcmp(argv[i], "--concatenar") == 0)
-//        {
-//            if (concatenar(nombreArchivo, nombreArchivo2) != TODO_OK)
-//            {
-//                puts("Error al concatenar la imagen.");
-//                return NO_SE_PUEDE_CREAR_ARCHIVO;
-//            }
-//        }
-        else if (strcmp(argv[i], "--achicar") == 0)
+        else if (strcmp(argv[i], "--rotar-180") == 0)
         {
-            if (achicar(nombreArchivo) != TODO_OK)
+            if (rotar180Grados(nombreArchivo) != TODO_OK)
             {
-                puts("Error al achicar la imagen.");
-                return NO_SE_PUEDE_CREAR_ARCHIVO;
-            }
-        }
-        else if (strcmp(argv[i], "--monocromo") == 0)
-        {
-            if (monocromo(nombreArchivo) != TODO_OK)
-            {
-                puts("Error al hacer monocromo a la imagen.");
+                puts("Error al rotar la imagen 180 grados.");
                 return NO_SE_PUEDE_CREAR_ARCHIVO;
             }
         }
@@ -171,6 +158,7 @@ int leerBMP(const char *nombreArchivo, t_metadata *metadata, t_pixel **imagen)
 
     fseek(archivo, inicioIMG, SEEK_SET);
     int padding = (4 - (metadata->ancho * 3) % 4) % 4;
+    fseek(archivo, padding, SEEK_CUR);
 
     for (int i = 0; i < metadata->alto; i++)
     {
@@ -571,164 +559,43 @@ int rotarIzquierda(const char *nombreArchivo)
     return TODO_OK;
 }
 
-int concatenar(const char *nombreArchivo1, const char *nombreArchivo2)
-{
-    t_metadata metadata1, metadata2;
-    t_pixel *imagen1, *imagen2;
-
-    // Leer la primera imagen
-    if (leerBMP(nombreArchivo1, &metadata1, &imagen1) != TODO_OK)
-        return ARCHIVO_NO_ENCONTRADO;
-
-    // Leer la segunda imagen
-    if (leerBMP(nombreArchivo2, &metadata2, &imagen2) != TODO_OK) {
-        free(imagen1);
-        return ARCHIVO_NO_ENCONTRADO;
-    }
-
-    // Calcular el nuevo ancho y alto de la imagen concatenada
-    unsigned int nuevoAncho = (metadata1.ancho > metadata2.ancho) ? metadata1.ancho : metadata2.ancho;
-    unsigned int nuevoAlto = metadata1.alto + metadata2.alto;
-
-    // Crear una nueva imagen para almacenar la imagen concatenada
-    t_pixel *imagenConcatenada = (t_pixel *)malloc(sizeof(t_pixel) * nuevoAncho * nuevoAlto);
-    if (!imagenConcatenada)
-    {
-        free(imagen1);
-        free(imagen2);
-        return ERR_MEM;
-    }
-
-    // Copiar la primera imagen a la imagen concatenada
-    for (unsigned int i = 0; i < metadata1.alto; i++)
-    {
-        for (unsigned int j = 0; j < metadata1.ancho; j++)
-            imagenConcatenada[i * nuevoAncho + j] = imagen1[i * metadata1.ancho + j];
-        // Rellenar con color de relleno la parte adicional del ancho
-        for (unsigned int j = metadata1.ancho; j < nuevoAncho; j++)
-        {
-            imagenConcatenada[i * nuevoAncho + j].pixel[0] = 100; // Color de relleno, por ejemplo
-            imagenConcatenada[i * nuevoAncho + j].pixel[1] = 150;
-            imagenConcatenada[i * nuevoAncho + j].pixel[2] = 200;
-        }
-    }
-
-    // Copiar la segunda imagen a la imagen concatenada
-    for (unsigned int i = 0; i < metadata2.alto; i++)
-    {
-        for (unsigned int j = 0; j < metadata2.ancho; j++)
-            imagenConcatenada[(metadata1.alto + i) * nuevoAncho + j] = imagen2[i * metadata2.ancho + j];
-        // Rellenar con color de relleno la parte adicional del ancho
-        for (unsigned int j = metadata2.ancho; j < nuevoAncho; j++)
-        {
-            imagenConcatenada[(metadata1.alto + i) * nuevoAncho + j].pixel[0] = 100; // Color de relleno, por ejemplo
-            imagenConcatenada[(metadata1.alto + i) * nuevoAncho + j].pixel[1] = 150;
-            imagenConcatenada[(metadata1.alto + i) * nuevoAncho + j].pixel[2] = 200;
-        }
-    }
-
-    // Actualizar la metadata
-    metadata1.ancho = nuevoAncho;
-    metadata1.alto = nuevoAlto;
-    metadata1.tamArchivo = nuevoAncho * nuevoAlto * sizeof(t_pixel) + 54;
-
-    // Guardar la imagen concatenada en el archivo
-    char nombreArchivoConcatenado[255] = "reyes_concatenar.bmp";
-    int resultado = guardarBMP(nombreArchivoConcatenado, &metadata1, imagenConcatenada);
-
-    // Liberar la memoria
-    free(imagen1);
-    free(imagen2);
-    free(imagenConcatenada);
-
-    return resultado;
-}
-
-int achicar(const char *nombreArchivo)
+int rotar180Grados(const char *nombreArchivo)
 {
     t_metadata metadata;
     t_pixel *imagen;
 
-    // Leer la imagen original
-    if (leerBMP(nombreArchivo, &metadata, &imagen) != TODO_OK)
+    if(leerBMP(nombreArchivo, &metadata, &imagen) != TODO_OK)
         return ARCHIVO_NO_ENCONTRADO;
 
-    // Calcular el nuevo ancho y alto de la imagen achicada
-    unsigned int nuevoAncho = metadata.ancho / 2;
-    unsigned int nuevoAlto = metadata.alto / 2;
-
-    // Crear una nueva imagen para almacenar la imagen achicada
-    t_pixel *imagenAchicada = (t_pixel *)malloc(sizeof(t_pixel) * nuevoAncho * nuevoAlto);
-    if (!imagenAchicada)
+     t_pixel *nuevaImagen = (t_pixel *)malloc(metadata.ancho * metadata.alto * sizeof(t_pixel));
+    if(!nuevaImagen)
     {
         free(imagen);
-        return ERR_MEM;
+        return NO_SE_PUEDE_CREAR_ARCHIVO;
     }
 
-    // Copiar la imagen original a la imagen achicada
-    for (unsigned int i = 0; i < nuevoAlto; i++)
+    // ROTAR 180°
+    for (unsigned int i = 0; i < metadata.alto; i++) // y
     {
-        for (unsigned int j = 0; j < nuevoAncho; j++)
-            imagenAchicada[i * nuevoAncho + j] = imagen[i * metadata.ancho * 2 + j * 2];
-    }
-
-    // Actualizar la metadata
-    metadata.ancho = nuevoAncho;
-    metadata.alto = nuevoAlto;
-    metadata.tamArchivo = nuevoAncho * nuevoAlto * sizeof(t_pixel) + 54;
-
-    // Guardar la imagen achicada en el archivo
-    char nombreArchivoAchicado[255] = "reyes_achicar.bmp";
-    int resultado = guardarBMP(nombreArchivoAchicado, &metadata, imagenAchicada);
-
-    // Liberar la memoria
-    free(imagen);
-    free(imagenAchicada);
-
-    return resultado;
-}
-
-int monocromo(const char *nombreArchivo)
-{
-    t_metadata metadata;
-    t_pixel *imagen;
-
-    // Leer la imagen original
-    if (leerBMP(nombreArchivo, &metadata, &imagen) != TODO_OK)
-        return ARCHIVO_NO_ENCONTRADO;
-
-    // Crear una nueva imagen para almacenar la imagen monocromo
-    t_pixel *imagenMonocromo = (t_pixel *)malloc(sizeof(t_pixel) * metadata.ancho * metadata.alto);
-    if (!imagenMonocromo)
-    {
-        free(imagen);
-        return ERR_MEM;
-    }
-
-    // Convertir la imagen original a monocromo
-    for (unsigned int i = 0; i < metadata.alto; i++)
-    {
-        for (unsigned int j = 0; j < metadata.ancho; j++)
+        for (unsigned int j = 0; j < metadata.ancho; j++) // x
         {
-            unsigned char promedio = (imagen[i * metadata.ancho + j].pixel[0] + imagen[i * metadata.ancho + j].pixel[1] + imagen[i * metadata.ancho + j].pixel[2]) / 3;
-            imagenMonocromo[i * metadata.ancho + j].pixel[0] = promedio < 128 ? 0 : 255;
-            imagenMonocromo[i * metadata.ancho + j].pixel[1] = 0;
-            imagenMonocromo[i * metadata.ancho + j].pixel[2] = 0;
+            unsigned int posicionOriginal = i * metadata.ancho + j;
+            unsigned int posicionNueva = (metadata.alto - i - 1) * metadata.ancho + (metadata.ancho - j - 1);
+            nuevaImagen[posicionNueva] = imagen[posicionOriginal];
         }
     }
 
-    // Actualizar la metadata
-    metadata.profundidad = 1;
-    metadata.tamArchivo = metadata.ancho * metadata.alto / 8 + 54;
-    metadata.tamEncabezado = 54;
+    metadata.tamArchivo = 54 + (metadata.ancho * metadata.alto * sizeof(t_pixel));
 
-    // Guardar la imagen monocromo en el archivo
-    char nombreArchivoMonocromo[255] = "reyes_monocromo.bmp";
-    int resultado = guardarBMP(nombreArchivoMonocromo, &metadata, imagenMonocromo);
+    char nombreArchivoRotada180[255] = "reyes_rotar-180.bmp";
+    if(guardarBMP(nombreArchivoRotada180, &metadata, nuevaImagen) != TODO_OK)
+    {
+        free(imagen);
+        free(nuevaImagen);
+        return NO_SE_PUEDE_CREAR_ARCHIVO;
+    }
 
-    // Liberar la memoria
     free(imagen);
-    free(imagenMonocromo);
-
-    return resultado;
+    free(nuevaImagen);
+    return TODO_OK;
 }
