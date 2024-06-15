@@ -25,9 +25,10 @@ int solucion(int argc, char *argv[])
     if (argc < 3)
         return ERR_ARG;
 
-    const char *nombreArchivo = argv[argc - 1];
+    const char *nombreArchivo = argv[argc - 2];
+    const char *nombreArchivo2 = argv[argc - 1];
 
-    for (int i = 1; i < argc - 1; i++)
+    for (int i = 1; i < argc - 2; i++)
     {
         if (strcmp(argv[i], "--escala-de-grises") == 0)
         {
@@ -114,6 +115,14 @@ int solucion(int argc, char *argv[])
             if (rotar180Grados(nombreArchivo) != TODO_OK)
             {
                 puts("Error al rotar la imagen 180 grados.");
+                return NO_SE_PUEDE_CREAR_ARCHIVO;
+            }
+        }
+        else if (strcmp(argv[i], "--concatenar") == 0)
+        {
+            if (concatenar(nombreArchivo, nombreArchivo2) != TODO_OK)
+            {
+                puts("Error al concatenar la imagen.");
                 return NO_SE_PUEDE_CREAR_ARCHIVO;
             }
         }
@@ -597,5 +606,79 @@ int rotar180Grados(const char *nombreArchivo)
 
     free(imagen);
     free(nuevaImagen);
+    return TODO_OK;
+}
+
+int concatenar (const char* nombreArchivo, const char* nombreArchivo2)
+{
+    t_metadata metadata, metadata2, nueva_metadata;
+    t_pixel *img;
+    t_pixel *img2;
+    t_pixel *imgCon;
+    unsigned char color[3] = {93, 108, 255}; //azul, verde, rojo
+
+    if (leerBMP(nombreArchivo, &metadata, &img) != TODO_OK)
+        return ARCHIVO_NO_ENCONTRADO;
+
+    if (leerBMP(nombreArchivo2, &metadata2, &img2) != TODO_OK) {
+        free(img);
+        return ARCHIVO_NO_ENCONTRADO;
+    }
+
+    int nuevoAncho = (metadata.ancho > metadata2.ancho) ? metadata.ancho : metadata2.ancho;
+    int nuevoAlto = metadata.alto + metadata2.alto;
+
+    imgCon = malloc(nuevoAlto * nuevoAncho * sizeof(t_pixel));
+    if (!imgCon)
+    {
+        free(img);
+        free(img2);
+        return NO_SE_PUEDE_CREAR_ARCHIVO;
+    }
+
+    nueva_metadata.tamArchivo = nuevoAncho * nuevoAlto * 3 + sizeof(t_metadata);
+    nueva_metadata.tamEncabezado = sizeof(t_metadata);
+    nueva_metadata.ancho = nuevoAncho;
+    nueva_metadata.alto = nuevoAlto;
+    nueva_metadata.profundidad = metadata.profundidad;
+
+    // Rellenar con nuevo color
+   for (int i = 0; i < nuevoAlto; i++)
+    {
+        for (int j = 0; j < nuevoAncho; j++)
+        {
+            imgCon[i * nuevoAncho + j].pixel[0] = color[0];
+            imgCon[i * nuevoAncho + j].pixel[1] = color[1];
+            imgCon[i * nuevoAncho + j].pixel[2] = color[2];
+            imgCon[i * nuevoAncho + j].profundidad = img[0].profundidad; // Suponiendo que todas las imÃ¡genes tienen la misma profundidad
+        }
+    }
+
+    // Copiar primera imagen
+    for (int i = 0; i < metadata.alto; i++)
+    {
+        for (int j = 0; j < metadata.ancho; j++)
+            imgCon[i * nuevoAncho + j] = img[i * metadata.ancho + j];
+    }
+
+    // Copiar segunda imagen
+    for (int i = 0; i < metadata2.alto; i++)
+    {
+        for (int j = 0; j < metadata2.ancho; j++)
+            imgCon[(i + metadata.alto) * nuevoAncho + j] = img2[i * metadata2.ancho + j];
+    }
+
+    char nombreArchivoConcatenar[255] = "reyes_concatenar.bmp";
+    if (guardarBMP(nombreArchivoConcatenar, &nueva_metadata, imgCon) != TODO_OK)
+    {
+        free(img);
+        free(img2);
+        free(imgCon);
+        return NO_SE_PUEDE_CREAR_ARCHIVO;
+    }
+
+    free(img);
+    free(img2);
+    free(imgCon);
     return TODO_OK;
 }
