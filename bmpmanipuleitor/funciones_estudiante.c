@@ -643,7 +643,7 @@ int concatenar (const char* nombreArchivo, const char* nombreArchivo2)
     nueva_metadata.profundidad = metadata.profundidad;
 
     // Rellenar con nuevo color
-   for (int i = 0; i < nuevoAlto; i++)
+   for (int i = 0; i < nuevoAlto; i++) // Si se pone metadata.alto aca, se bugea el color a negro y tambien el padding
     {
         for (int j = 0; j < nuevoAncho; j++)
         {
